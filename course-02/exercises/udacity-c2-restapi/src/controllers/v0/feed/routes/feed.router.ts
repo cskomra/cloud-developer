@@ -2,10 +2,13 @@ import { Router, Request, Response } from 'express';
 import { FeedItem } from '../models/FeedItem';
 import { requireAuth } from '../../users/routes/auth.router';
 import * as AWS from '../../../../aws';
+import { StringDecoder } from 'string_decoder';
 
 const router: Router = Router();
 
 // Get all feed items
+// not server route, but from where the router is entering: api/v0/feed/routes
+//                                                          ^^controller folder
 router.get('/', async (req: Request, res: Response) => {
     const items = await FeedItem.findAndCountAll({order: [['id', 'DESC']]});
     items.rows.map((item) => {
@@ -18,13 +21,37 @@ router.get('/', async (req: Request, res: Response) => {
 
 //@TODO
 //Add an endpoint to GET a specific resource by Primary Key
+router.get('/:id', async (req: Request, res: Response) => {
+    let {id} = req.params;
+    if (!id){
+        //respond with an error if not
+        return res.status(400).send('the id is required');
+      }
+    const item = await FeedItem.findByPk(id)
+      .then(data => {
+          if(data.url){data.url = AWS.getGetSignedUrl(data.url)}
+        res.status(200).send(data);
+      });
+});
+
 
 // update a specific resource
-router.patch('/:id', 
+router.patch('/:id',  
     requireAuth, 
     async (req: Request, res: Response) => {
-        //@TODO try it yourself
-        res.send(500).send("not implemented")
+        const { id } = req.params;
+        const caption = req.body.caption;
+        const fileName = req.body.url;
+
+        let feedItem = await FeedItem.findByPk(id)
+        .then(data => {
+            if(caption) {data.update({ caption: caption })}
+            if(fileName){data.update({ url: fileName })}
+
+            data.url = AWS.getGetSignedUrl(data.url);
+            
+            res.status(200).send(data);
+        }).catch(()=>{res.status(404).send('FeedItem Not Found')});
 });
 
 

@@ -8,7 +8,9 @@ import bodyParser from 'body-parser';
 import { V0MODELS } from './controllers/v0/model.index';
 
 (async () => {
+  //VOMODELS - imported list of data models (see above)
   await sequelize.addModels(V0MODELS);
+  //uses migrations to keep db in synch with sequelize models
   await sequelize.sync();
 
   const app = express();
