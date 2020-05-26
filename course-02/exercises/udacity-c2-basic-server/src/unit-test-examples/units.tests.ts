@@ -29,6 +29,7 @@ describe('divide', () => {
     expect(result).to.equal(2.5);
   });
 
+  //a bit different: expect <run the function> to throw error
   it('should throw an error if div by zero', () => {
     expect(()=>{ divide(5,0) }).to.throw('div by 0')
   });

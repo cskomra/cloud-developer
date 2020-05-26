@@ -70,13 +70,70 @@ import { Car, cars as cars_list } from './cars';
 
   // @TODO Add an endpoint to GET a list of cars
   // it should be filterable by make with a query paramater
+    // Get a greeting to a specific person to demonstrate req.query
+  // > try it {{host}}/cars?id=carId
+  app.get( "/cars/", ( req: Request, res: Response ) => {
+    let { make } = req.query;
 
-  // @TODO Add an endpoint to get a specific car
-  // it should require id
-  // it should fail gracefully if no matching car is found
+    let cars_list = cars;
 
+    //if we have an optional query parameter, filter by it
+    if(make){
+      cars_list = cars.filter((car) => car.make === make);
+    }
+
+    // return the resulting list along with 200 success
+    res.status(200)
+              .send(cars_list);
+  } );
+
+
+  app.get( "/cars/:id", (req: Request, res: Response) => {
+    // destruct our path params
+    let { id } = req.params;
+
+    //check to make sure the id is set
+    if (!id){
+      //respond with an error if not
+      return res.status(400).send('id is required');
+    }
+
+    // try to find the car by id
+    const car = cars.filter((car) => car.id == id);
+
+    // respond not found, if we do not have this id
+    if (car && car.length === 0){
+      return res.status(404).send('car is not found');
+    }
+
+    //return the car with a success status code
+    res.status(200).send(car);
+  })
   /// @TODO Add an endpoint to post a new car to our list
   // it should require id, type, model, and cost
+// Post a greeting to a specific person
+  // to demonstrate req.body
+  // > try it by posting {"name": "the_name" } as 
+  // an application/json body to {{host}}/persons
+  app.post( "/cars", 
+    async ( req: Request, res: Response ) => {
+
+      let {make, type, model, cost, id} = req.body;
+
+      if ( !make || !type || !model || !cost || !id ) {
+        return res.status(400)
+                  .send("car is required: {make, type, model, cost, id}");
+      }
+
+      const newCar = { make: make, type: type, model: model, cost: parseInt(cost), id: parseInt(id) };
+      cars.push(newCar);
+
+      return res.status(201)
+                .send(newCar);
+  } );
+
+
+
 
   // Start the Server
   app.listen( port, () => {
