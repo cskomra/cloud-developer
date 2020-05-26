@@ -28,7 +28,19 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
 
   /**************************************************************************** */
+  // GET /filteredimage?image_url={{URL}}
+  app.get( "/filteredimage/", (req, res) => {
+    let { image_url } = req.query;
+    console.log(image_url);
 
+    if ( !image_url ) {
+      return res.status(400)
+                .send('image is required');
+    }
+
+    return res.status(200)
+              .send(`Image is: ${image_url}`);
+  })
   //! END @TODO1
   
   // Root Endpoint
