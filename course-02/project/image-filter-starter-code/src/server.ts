@@ -28,25 +28,41 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
 
   /**************************************************************************** */
+  
+  // Validate image
+  /* reference https://stackoverflow.com
+     /questions/30970068/js-regex-url-validation/30970319 
+  */
+  const validateUrl = async (url:string) => {
+    console.log('VALIDATING');
+    var isUrl = url.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
+    if(isUrl == null)
+        return false;
+    else
+        return true;
+  }
+  
   // GET /filteredimage?image_url={{URL}}
   app.get( "/filteredimage/", async (req, res) => {
     let { image_url } = req.query;
     console.log(image_url);
-    
-    if ( !image_url ) {
-      return res.status(400)
-                .send('invalid url or no url');
+
+    let isValid = await validateUrl(image_url);
+
+    if(!isValid) {
+      return res.status(400).send('invalid url or no url');
     }
 
     filterImageFromURL(image_url)
-      .then(filteredPath => {
-        res.status(200).sendFile(filteredPath, () => {
-          deleteLocalFiles([filteredPath])
-        })
+    .then(filteredPath => {
+      res.status(200).sendFile(filteredPath, () => {
+        deleteLocalFiles([filteredPath])
       })
-      .catch(() => {res.status(500).send()});
+    })
+    .catch(() => {res.status(400).send('invalid url or no url')});
+    
+    console.log("DONE!");
 
-      console.log("DONE!")
   });
 
   //! END @TODO1
