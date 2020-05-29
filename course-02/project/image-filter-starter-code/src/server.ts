@@ -1,6 +1,8 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import { Request, Response } from 'express';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
+import { any } from 'bluebird';
 
 (async () => {
 
@@ -43,8 +45,8 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   }
   
   // GET /filteredimage?image_url={{URL}}
-  app.get( "/filteredimage/", async (req, res) => {
-    let { image_url } = req.query;
+  app.get( "/filteredimage/", async (req: Request, res: Response) => {
+    let { image_url }  = req.query;
     console.log(image_url);
 
     let isValid = await validateUrl(image_url);
@@ -69,7 +71,7 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   
   // Root Endpoint
   // Displays a simple message to the user
-  app.get( "/", async ( req, res ) => {
+  app.get( "/", async ( req: any, res: Response ) => {
     res.send("try GET /filteredimage?image_url={{}}")
   } );
   
