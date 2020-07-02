@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { FeedItem } from '../models/FeedItem';
-import { requireAuth } from '../../users/routes/auth.router';
+import { requireAuth } from '../../feed/routes/auth.router';
 import * as AWS from '../../../../aws';
 import { StringDecoder } from 'string_decoder';
 
